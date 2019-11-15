@@ -1,0 +1,25 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>CuteApp</title>
+    <link rel="stylesheet" type="text/css" href="css/custom.css">
+
+</head>
+<body>
+    <h1 class="under_construction">Under Construction</h1>
+</body>
+    <script type="text/javascript" src="js/custom.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        var socket = io();
+        setTimeout(function(){
+            console.log("emit here...")
+            socket.emit("new_connected", "here...")   
+        }, 5000)
+        
+    </script>
+
+</html>
