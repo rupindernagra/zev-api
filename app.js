@@ -10,14 +10,23 @@ var rawBodySaver = function (req, res, buf, encoding) {
         req.rawBody = buf.toString(encoding || 'utf8');
     }
 }
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 app.use(bodyParser.json({ verify: rawBodySaver }));
 app.use(bodyParser.urlencoded({ verify: rawBodySaver, extended: true }));
 //app.use(bodyParser.raw({ verify: rawBodySaver, type: '*/*' }));
 
 var AuthController = require('./controllers/AuthController');
 var RegisterController = require('./controllers/RegisterController');
+var SpaceController = require('./controllers/SpaceController');
 app.use('/api/auth', AuthController);
 app.use('/api/register', RegisterController);
+app.use('/api/space/add', SpaceController);
 
 // default assets location
 app.use(express.static(__dirname + '/assets'));
