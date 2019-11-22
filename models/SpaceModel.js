@@ -33,6 +33,17 @@ class SpaceModel extends BaseModel {
         this.save(callback)
     }
 
+    get_spaces(callback) {
+        var query = "Select * from " + this._table;
+        this.find(query, function(err, result) {
+            if(result && result.length == 0) {
+                callback({ 'result': "No Space is available" }, false);
+            } else {
+                callback(false, result);
+            }
+        });
+    }
+
 }
 
 module.exports = new SpaceModel()

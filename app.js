@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var db = require('./db');
 var bodyParser = require('body-parser');
+var multer = require('multer');
 
 //var UserController = require('./controllers/UserController');
 //app.use('/users', UserController);
@@ -26,7 +27,12 @@ var RegisterController = require('./controllers/RegisterController');
 var SpaceController = require('./controllers/SpaceController');
 app.use('/api/auth', AuthController);
 app.use('/api/register', RegisterController);
+app.use('/api/spaces', SpaceController);
 app.use('/api/space/add', SpaceController);
+
+// app.use("/api/Upload", function(req, res) {
+    
+// });
 
 // default assets location
 app.use(express.static(__dirname + '/assets'));
