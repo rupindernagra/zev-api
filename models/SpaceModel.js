@@ -33,11 +33,22 @@ class SpaceModel extends BaseModel {
         this.save(callback)
     }
 
-    get_spaces(callback) {
+    findAll(callback) {
         var query = "Select * from " + this._table;
         this.find(query, function(err, result) {
             if(result && result.length == 0) {
                 callback({ 'result': "No Space is available" }, false);
+            } else {
+                callback(false, result);
+            }
+        });
+    }
+    
+    findById(spaceId, callback) {
+        var query = "Select * from " + this._table + " where id = '"+ spaceId +"'";
+        this.find(query, function(err, result) {
+            if(result && result.length == 0) {
+                callback({ 'result': `Space ${spaceId} doesn't exist` }, false);
             } else {
                 callback(false, result);
             }

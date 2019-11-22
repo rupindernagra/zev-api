@@ -27,8 +27,7 @@ var RegisterController = require('./controllers/RegisterController');
 var SpaceController = require('./controllers/SpaceController');
 app.use('/api/auth', AuthController);
 app.use('/api/register', RegisterController);
-app.use('/api/spaces', SpaceController);
-app.use('/api/space/add', SpaceController);
+app.use('/api/space', SpaceController);
 
 // app.use("/api/Upload", function(req, res) {
     

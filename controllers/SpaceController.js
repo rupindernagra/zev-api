@@ -17,18 +17,7 @@ var SpaceModel = require('../models/SpaceModel')
 //     }
 // });
 
-router.get('', [commonMiddleware], function (req, res) {
-
-    SpaceModel.get_spaces(function(err, result) {
-        if (err) {
-            return res.status(500).send({ status: false, errors: err });
-        }
-        return res.send({ status: true, message: 'Get all Spaces', results: result });
-    });
-    
-});
-
-router.post('', [commonMiddleware], function (req, res) {
+router.post('/add', [commonMiddleware], function (req, res) {
 
     SpaceModel.add_space(req.body, function (err, result) {
         if (err) { return res.status(500).send({ status: false, errors: err }); }
@@ -40,6 +29,29 @@ router.post('', [commonMiddleware], function (req, res) {
     //     }
     //     return res.end("File uploaded sucessfully!.");
     // });
+});
+
+router.get('/get', [commonMiddleware], function (req, res) {
+
+    SpaceModel.findAll(function(err, result) {
+        if (err) {
+            return res.status(500).send({ status: false, errors: err });
+        }
+        return res.send({ status: true, message: 'Get all Spaces', results: result });
+    });
+    
+});
+
+router.get('/:id', [commonMiddleware], function (req, res) {
+
+    const spaceId = req.params.id;
+    SpaceModel.findById(spaceId, function(err, result) {
+        if (err) {
+            return res.status(500).send({ status: false, errors: err });
+        }
+        return res.send({ status: true, message: 'Space is found', results: result });
+    });
+    
 });
 
 module.exports = router;
