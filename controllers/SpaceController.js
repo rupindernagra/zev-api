@@ -37,7 +37,7 @@ router.get('/get', [commonMiddleware], function (req, res) {
         if (err) {
             return res.status(500).send({ status: false, errors: err });
         }
-        return res.send({ status: true, message: 'Get all Spaces', results: result });
+        return res.send({ status: true, message: 'Get all Spaces', result: result });
     });
     
 });
@@ -49,7 +49,7 @@ router.get('/:id', [commonMiddleware], function (req, res) {
         if (err) {
             return res.status(500).send({ status: false, errors: err });
         }
-        return res.send({ status: true, message: 'Space is found', results: result });
+        return res.send({ status: true, message: 'Space is found', result: result });
     });
     
 });
