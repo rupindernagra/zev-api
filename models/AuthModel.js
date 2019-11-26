@@ -16,7 +16,7 @@ class AuthModel extends BaseModel {
         var query = `SELECT * FROM ${this._table} WHERE email = '${data.email}' AND password = '${data.password}'`;
         this.find(query, function(err, result) {
             if(result && result.length == 0) {
-                callback({ 'result': `User doesn't exist` }, false);
+                callback({ 'result': `User does not exist` }, false);
             } else {
                 callback(false, result);
             }

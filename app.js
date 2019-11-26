@@ -25,9 +25,11 @@ app.use(bodyParser.urlencoded({ verify: rawBodySaver, extended: true }));
 var AuthController = require('./controllers/AuthController');
 var RegisterController = require('./controllers/RegisterController');
 var SpaceController = require('./controllers/SpaceController');
+var ApplicationsController = require('./controllers/ApplicationsController');
 app.use('/api/auth', AuthController);
 app.use('/api/register', RegisterController);
 app.use('/api/space', SpaceController);
+app.use('/api/application', ApplicationsController);
 
 // app.use("/api/Upload", function(req, res) {
     
