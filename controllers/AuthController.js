@@ -11,7 +11,7 @@ router.post('/login', [commonMiddleware], function (req, res) {
 
   AuthModel.login(req.body, function (err, result) {
       if (err) { return res.status(500).send({ status: false, errors: err }); }
-      return res.send({ status: true, message: 'User successfully logged in!' });
+      return res.send({ status: true, message: 'User successfully logged in!', result: result[0] });
   });
   
 });

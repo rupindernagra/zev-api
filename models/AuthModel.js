@@ -13,7 +13,7 @@ class AuthModel extends BaseModel {
     }
     
     login(data, callback) {
-        var query = `SELECT * FROM ${this._table} WHERE email = '${data.email}' AND password = '${data.password}'`;
+        var query = `SELECT id, firstname, lastname, email, phone FROM ${this._table} WHERE email = '${data.email}' AND password = '${data.password}'`;
         this.find(query, function(err, result) {
             if(result && result.length == 0) {
                 callback({ 'result': `User does not exist` }, false);

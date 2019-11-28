@@ -10,10 +10,11 @@ class SpaceModel extends BaseModel {
             description: { 'type': 'text', 'required': false, 'value': '', 'error': 'Description is Required!' },
             city: { 'type': 'text', 'required': true, 'value': '', 'error': 'City is Required!' },
             lat_long: { 'type': 'text', 'required': false, 'value': '', 'error': 'Lat and Long is Required!' },
+            price: { 'type': 'text', 'required': true, 'value': '', 'error': 'Price is required' },
             image_url: { 'type': 'text', 'required': false, 'value': '', 'error': 'Please Upload image' },
             gallery: { 'type': 'text', 'required': false, 'value': '' },
             space_status: { 'type': 'password', 'required': true, 'value': '', 'error': 'Password is Required!' },
-            user_id: { 'type': 'number', 'required': false, 'value': '0', 'error': 'Please input Current user ID' },
+            user_id: { 'type': 'number', 'required': true, 'value': '', 'error': 'Please input Current user ID' },
             space_type: { 'type': 'text', 'required': true, 'value': '', 'error': 'Space type is required' },
             floor_space: { 'type': 'text', 'required': false, 'value': '0.00' },
             no_of_balconies: { 'type': 'number', 'required': false, 'value': '' },
@@ -23,6 +24,7 @@ class SpaceModel extends BaseModel {
             no_of_garages: { 'type': 'number', 'required': false, 'value': 0 },
             no_of_parkings: { 'type': 'number', 'required': false, 'value': 0 },
             pets_allowed: { 'type': 'text', 'required': false, 'value': 0 },
+            pool: { 'type': 'text', 'required': false, 'value': 0 },
             // updated_at: { 'type': 'Date', 'required': false, 'value': '' },
         }
         this._table = "spaces"
@@ -49,6 +51,28 @@ class SpaceModel extends BaseModel {
         this.find(query, function(err, result) {
             if(result && result.length == 0) {
                 callback({ 'result': `Space ${spaceId} doesn't exist` }, false);
+            } else {
+                callback(false, result);
+            }
+        });
+    }
+
+    mySpaces(userId, callback) {
+        var query = `SELECT * FROM ${this._table} WHERE user_id = ${userId}`;
+        this.find(query, function(err, result) {
+            if((result && result.length === 0) || result === undefined) {
+                callback({ 'result': `Spaces not found` }, false);
+            } else {
+                callback(false, result);
+            }
+        });
+    }
+
+    mySpaceById(data, callback) {
+        var query = `SELECT * FROM ${this._table} WHERE user_id = ${data.userId} AND id = ${data.spaceId}`;
+        this.find(query, function(err, result) {
+            if((result && result.length === 0) || result === undefined) {
+                callback({ 'result': `Space doesn't exist` }, false);
             } else {
                 callback(false, result);
             }
