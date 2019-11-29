@@ -1,4 +1,5 @@
 var BaseModel = require('./BaseModel');
+var ApplicationsModel = require('./ApplicationsModel');
 
 class SpaceModel extends BaseModel {
 
@@ -28,6 +29,7 @@ class SpaceModel extends BaseModel {
             // updated_at: { 'type': 'Date', 'required': false, 'value': '' },
         }
         this._table = "spaces"
+        this.applications =  ApplicationsModel._table;
     }
 
     add_space(data, callback) {
@@ -36,7 +38,7 @@ class SpaceModel extends BaseModel {
     }
 
     findAll(callback) {
-        var query = "Select * from " + this._table;
+        var query = `SELECT * FROM ${this._table}`;
         this.find(query, function(err, result) {
             if(result && result.length == 0) {
                 callback({ 'message': "No Space is available" }, false);
@@ -47,10 +49,10 @@ class SpaceModel extends BaseModel {
     }
     
     findById(spaceId, callback) {
-        var query = "Select * from " + this._table + " where id = '"+ spaceId +"'";
+        var query = `SELECT * FROM ${this._table} WHERE id = '${spaceId}'`;
         this.find(query, function(err, result) {
             if(result && result.length == 0) {
-                callback({ 'message': `Space ${spaceId} doesn't exist` }, false);
+                callback({ 'message': `Space id: ${spaceId} doesn't exist` }, false);
             } else {
                 callback(false, result[0]);
             }
@@ -58,7 +60,7 @@ class SpaceModel extends BaseModel {
     }
 
     mySpaces(userId, callback) {
-        var query = `SELECT * FROM ${this._table} WHERE user_id = ${userId}`;
+        var query = `SELECT S.*, (SELECT COUNT(A.space_id) FROM ${this.applications} A WHERE A.space_id = S.id ) AS applicants FROM ${this._table} S WHERE S.user_id = ${userId}`;
         this.find(query, function(err, result) {
             if((result && result.length === 0) || result === undefined) {
                 callback({ 'message': `Spaces not found` }, false);
@@ -69,7 +71,7 @@ class SpaceModel extends BaseModel {
     }
 
     mySpaceById(data, callback) {
-        var query = `SELECT * FROM ${this._table} WHERE user_id = ${data.userId} AND id = ${data.spaceId}`;
+        var query = `SELECT S.*, (SELECT COUNT(A.space_id) FROM ${this.applications} A WHERE A.space_id = S.id ) AS applicants FROM ${this._table} S WHERE S.user_id = ${data.userId} AND S.id = ${data.spaceId}`;
         this.find(query, function(err, result) {
             if((result && result.length === 0) || result === undefined) {
                 callback({ 'message': `Space doesn't exist` }, false);
@@ -79,7 +81,7 @@ class SpaceModel extends BaseModel {
         });
     }
 
-    updateSpaceViews(data, callback) {
+    getSpaceAndUpdateViews(data, callback) {
         var query = `UPDATE ${this._table} SET views = ${ eval(data.views + 1) } WHERE id = ${data.spaceId} `;
         this.find(query, function(err, result) {
             if(result && result.length == 0) {

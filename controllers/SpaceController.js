@@ -42,7 +42,7 @@ router.get('/all', [commonMiddleware], function (req, res) {
     
 });
 
-router.get('/:id', [commonMiddleware], function (req, res) {
+router.get('/:spaceId', [commonMiddleware], function (req, res) {
 
     const { params: { spaceId } } = req;
     SpaceModel.findById(spaceId, function(err, result) {
@@ -86,9 +86,9 @@ router.put('/update/views/:spaceId', [commonMiddleware], function (req, res) {
         if (err) { return res.status(500).send({ status: false, errors: err }); }
         else {
             let data = { spaceId: spaceId, views: result.views }
-            SpaceModel.updateSpaceViews(data, function(err, result) {
+            SpaceModel.getSpaceAndUpdateViews(data, function(err, response) {
                 if (err) { return res.status(500).send({ status: false, errors: err }); }
-                return res.send({ status: true, message: 'Space views updated' });
+                return res.send({ status: true, message: 'Space views updated', result: result });
             });
         }
     })
