@@ -18,7 +18,7 @@ class AuthModel extends BaseModel {
             if(result && result.length == 0) {
                 callback({ 'result': `User does not exist` }, false);
             } else {
-                callback(false, result);
+                callback(false, result[0]);
             }
         });
     }
