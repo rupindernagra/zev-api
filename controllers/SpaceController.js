@@ -44,12 +44,12 @@ router.get('/all', [commonMiddleware], function (req, res) {
 
 router.get('/:id', [commonMiddleware], function (req, res) {
 
-    const spaceId = req.params.id;
+    const { params: { spaceId } } = req;
     SpaceModel.findById(spaceId, function(err, result) {
         if (err) {
             return res.status(500).send({ status: false, errors: err });
         }
-        return res.send({ status: true, message: 'Space is found', result: result[0] });
+        return res.send({ status: true, message: 'Space is found', result: result });
     });
     
 });
@@ -74,20 +74,25 @@ router.post('/my/:spaceId', [commonMiddleware], function (req, res) {
         if (err) {
             return res.status(500).send({ status: false, errors: err });
         }
-        return res.send({ status: true, message: 'Current User Space using ID', result: result[0] });
+        return res.send({ status: true, message: 'Current User Space using ID', result: result });
     });
     
 });
 
-// router.post('/my/:', [commonMiddleware], function (req, res) {
+router.put('/update/views/:spaceId', [commonMiddleware], function (req, res) {
 
-//     SpaceModel.findAll(function(err, result) {
-//         if (err) {
-//             return res.status(500).send({ status: false, errors: err });
-//         }
-//         return res.send({ status: true, message: 'Get all Spaces', result: result });
-//     });
+    const { params: { spaceId } } = req;
+    SpaceModel.findById(spaceId, function(err, result) {
+        if (err) { return res.status(500).send({ status: false, errors: err }); }
+        else {
+            let data = { spaceId: spaceId, views: result.views }
+            SpaceModel.updateSpaceViews(data, function(err, result) {
+                if (err) { return res.status(500).send({ status: false, errors: err }); }
+                return res.send({ status: true, message: 'Space views updated' });
+            });
+        }
+    })
     
-// });
+});
 
 module.exports = router;

@@ -39,7 +39,7 @@ class SpaceModel extends BaseModel {
         var query = "Select * from " + this._table;
         this.find(query, function(err, result) {
             if(result && result.length == 0) {
-                callback({ 'result': "No Space is available" }, false);
+                callback({ 'message': "No Space is available" }, false);
             } else {
                 callback(false, result);
             }
@@ -50,9 +50,9 @@ class SpaceModel extends BaseModel {
         var query = "Select * from " + this._table + " where id = '"+ spaceId +"'";
         this.find(query, function(err, result) {
             if(result && result.length == 0) {
-                callback({ 'result': `Space ${spaceId} doesn't exist` }, false);
+                callback({ 'message': `Space ${spaceId} doesn't exist` }, false);
             } else {
-                callback(false, result);
+                callback(false, result[0]);
             }
         });
     }
@@ -61,7 +61,7 @@ class SpaceModel extends BaseModel {
         var query = `SELECT * FROM ${this._table} WHERE user_id = ${userId}`;
         this.find(query, function(err, result) {
             if((result && result.length === 0) || result === undefined) {
-                callback({ 'result': `Spaces not found` }, false);
+                callback({ 'message': `Spaces not found` }, false);
             } else {
                 callback(false, result);
             }
@@ -72,7 +72,18 @@ class SpaceModel extends BaseModel {
         var query = `SELECT * FROM ${this._table} WHERE user_id = ${data.userId} AND id = ${data.spaceId}`;
         this.find(query, function(err, result) {
             if((result && result.length === 0) || result === undefined) {
-                callback({ 'result': `Space doesn't exist` }, false);
+                callback({ 'message': `Space doesn't exist` }, false);
+            } else {
+                callback(false, result[0]);
+            }
+        });
+    }
+
+    updateSpaceViews(data, callback) {
+        var query = `UPDATE ${this._table} SET views = ${ eval(data.views + 1) } WHERE id = ${data.spaceId} `;
+        this.find(query, function(err, result) {
+            if(result && result.length == 0) {
+                callback({ message: `Space not found with id: ${spaceId}` }, false);
             } else {
                 callback(false, result);
             }
