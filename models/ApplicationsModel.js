@@ -37,7 +37,7 @@ class ApplicationsModel extends BaseModel {
         var query = `SELECT A.*, S.* FROM ${this._table} A INNER JOIN ${this.Spaces} S ON A.space_id = S.id WHERE S.user_id = ${data.userId} AND S.id = ${data.spaceId}`;
         this.find(query, function(err, result) {
             if((result && result.length === 0) || result === undefined) {
-                callback({ message: `Application not found with space id: ${spaceId}` }, false);
+                callback({ message: `Application not found with space id: ${data.spaceId}` }, false);
             } else {
                 callback(false, result);
             }
