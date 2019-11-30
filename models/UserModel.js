@@ -22,7 +22,6 @@ class UserModel extends BaseModel {
     getUserData(userId, callback) {
         var query = `SELECT id, firstname, lastname, image, email, status, role, phone, brokerage, created_at, updated_at FROM ${this._table} WHERE id = ${userId}`;
         this.find(query, function(err, result) {
-            console.log('result', result);
             if(result && result.length == 0) {
                 callback({ message: `User id: ${userId} does not exist` }, false);
             } else {

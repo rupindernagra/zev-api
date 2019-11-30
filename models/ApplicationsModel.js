@@ -13,13 +13,42 @@ class ApplicationsModel extends BaseModel {
             phone: { 'type': 'phone', 'required': false, 'value': '' },
             message: { 'type': 'text', 'required': false, 'value': '' },
             reports: { 'type': 'text', 'required': false, 'value': '' }
-        }
-        this._table = "applications"
+        };
+        this._table = "applications";        
     }
 
     saveApplication(data, callback) {
         this.setAttributes(data);
         this.save(callback)
+    }
+
+    getApplicants(userId, callback) {
+        var query = `SELECT A.*, S.* FROM ${this._table} A INNER JOIN ${this.Spaces} S ON A.space_id = S.id WHERE S.user_id = ${userId}`;
+        this.find(query, function(err, result) {
+            if((result && result.length === 0) || result === undefined) {
+                callback({ message: `No Applicants found` }, false);
+            } else {
+                callback(false, result);
+            }
+        });
+    }
+
+    getApplicantBySpaceId(data, callback) {
+        var query = `SELECT A.*, S.* FROM ${this._table} A INNER JOIN ${this.Spaces} S ON A.space_id = S.id WHERE S.user_id = ${data.userId} AND S.id = ${data.spaceId}`;
+        this.find(query, function(err, result) {
+            if((result && result.length === 0) || result === undefined) {
+                callback({ message: `Application not found with space id: ${spaceId}` }, false);
+            } else {
+                callback(false, result);
+            }
+        });
+    }
+
+    get Spaces() {
+        if(typeof this.spaces === 'undefined') {
+            this.spaces = require('./SpaceModel')._table;        
+        }
+        return this.spaces
     }
 
 }

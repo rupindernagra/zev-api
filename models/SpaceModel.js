@@ -1,10 +1,9 @@
 var BaseModel = require('./BaseModel');
-var ApplicationsModel = require('./ApplicationsModel');
 
 class SpaceModel extends BaseModel {
 
     constructor() {
-        super()
+        super()        
         this.attributes = {
             id: { 'type': 'number', 'required': false, 'value': 0 },
             space_name: { 'type': 'text', 'required': true, 'value': '', 'error': 'Space Name is Required' },
@@ -27,9 +26,8 @@ class SpaceModel extends BaseModel {
             pets_allowed: { 'type': 'text', 'required': false, 'value': 0 },
             pool: { 'type': 'text', 'required': false, 'value': 0 },
             // updated_at: { 'type': 'Date', 'required': false, 'value': '' },
-        }
-        this._table = "spaces"
-        this.applications =  ApplicationsModel._table;
+        };
+        this._table = "spaces";
     }
 
     add_space(data, callback) {
@@ -60,7 +58,7 @@ class SpaceModel extends BaseModel {
     }
 
     mySpaces(userId, callback) {
-        var query = `SELECT S.*, (SELECT COUNT(A.space_id) FROM ${this.applications} A WHERE A.space_id = S.id ) AS applicants FROM ${this._table} S WHERE S.user_id = ${userId}`;
+        var query = `SELECT S.*, (SELECT COUNT(A.space_id) FROM ${this.Applications} A WHERE A.space_id = S.id ) AS applicants FROM ${this._table} S WHERE S.user_id = ${userId}`;
         this.find(query, function(err, result) {
             if((result && result.length === 0) || result === undefined) {
                 callback({ 'message': `Spaces not found` }, false);
@@ -71,7 +69,7 @@ class SpaceModel extends BaseModel {
     }
 
     mySpaceById(data, callback) {
-        var query = `SELECT S.*, (SELECT COUNT(A.space_id) FROM ${this.applications} A WHERE A.space_id = S.id ) AS applicants FROM ${this._table} S WHERE S.user_id = ${data.userId} AND S.id = ${data.spaceId}`;
+        var query = `SELECT S.*, (SELECT COUNT(A.space_id) FROM ${this.Applications} A WHERE A.space_id = S.id ) AS applicants FROM ${this._table} S WHERE S.user_id = ${data.userId} AND S.id = ${data.spaceId}`;
         this.find(query, function(err, result) {
             if((result && result.length === 0) || result === undefined) {
                 callback({ 'message': `Space doesn't exist` }, false);
@@ -90,6 +88,13 @@ class SpaceModel extends BaseModel {
                 callback(false, result);
             }
         });
+    }
+
+    get Applications() {
+        if(typeof this.applications === 'undefined') {
+            this.applications = require('./ApplicationsModel')._table
+        }
+        return this.applications
     }
 
 }
