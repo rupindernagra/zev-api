@@ -12,7 +12,16 @@ router.post('/spaces', [commonMiddleware], function (req, res) {
     const { body: { user_id, term } } = req;
     SearchModel.searchSpaces({userId: user_id, term}, function(err, result) {
         if (err) { return res.status(500).send({ status: false, errors: err }); }
-        return res.send({ status: true, message: 'Search result for Spaces', result: result });
+        return res.send({ status: true, message: 'Search results for Spaces', result: result });
+    });
+    
+});
+
+router.post('/applicants', [commonMiddleware], function (req, res) {
+
+    SearchModel.searchApplicants(req.body, function(err, result) {
+        if (err) { return res.status(500).send({ status: false, errors: err }); }
+        return res.send({ status: true, message: 'Search results for Applicants', result: result });
     });
     
 });
