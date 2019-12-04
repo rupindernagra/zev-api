@@ -30,6 +30,17 @@ class UserModel extends BaseModel {
         });
     }
 
+    updateAvatar(data, callback) {
+        var query = `UPDATE ${this._table} SET image = '${data.fileName}' WHERE id = ${data.userId}`;
+        this.find(query, function(err, result) {
+            if(result && result.length == 0) {
+                callback({ message: `User id: ${data.userId} does not exist` }, false);
+            } else {
+                callback(false, result);
+            }
+        });
+    }
+
 }
 
 module.exports = new UserModel()

@@ -27,7 +27,7 @@ router.post('/upload', function(req, res) {
     
     upload(req, res, function (err) {
         
-        if(req.file === 'undefined') {
+        if(req.files === 'undefined') {
             return res.status(500).send({ status: false, message: 'Sorry! Somethig went wrong.' });
         }
         else if (err instanceof multer.MulterError) {
@@ -38,7 +38,7 @@ router.post('/upload', function(req, res) {
             return res.status(500).json(err);
         }
 
-        return res.status(200).send({ status: true, message: 'File uploaded sucessfully!', result: req.files });
+        return res.status(200).send({ status: true, message: 'Images uploaded sucessfully!', result: req.files });
     })
 
 });
