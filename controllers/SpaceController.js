@@ -1,34 +1,55 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var multer = require('multer');
+var cors = require('cors');
 
 var commonMiddleware = require('../helpers/commonMiddleware')
 var router = express.Router();
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
-var SpaceModel = require('../models/SpaceModel')
+router.use(cors());
+var SpaceModel = require('../models/SpaceModel');
 
-// var Storage = multer.diskStorage({
-//     destination: function(req, file, callback) {
-//         callback(null, "./Images");
-//     },
-//     filename: function(req, file, callback) {
-//         callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
-//     }
-// });
+
+// Upload the multiple images of Space
+var storage = multer.diskStorage({
+    destination: function(req, file, callback) {
+        callback(null, "./assets/images/space");
+    },
+    filename: function(req, file, callback) {
+        callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
+    }
+});
+
+var upload = multer({ storage: storage }).array('file')
+
+router.post('/upload', function(req, res) {
+    
+    upload(req, res, function (err) {
+        
+        if(req.file === 'undefined') {
+            return res.status(500).send({ status: false, message: 'Sorry! Somethig went wrong.' });
+        }
+        else if (err instanceof multer.MulterError) {
+            console.log('in instance', err);
+            return res.status(500).json(err);
+        } else if (err) {
+            console.log('err', err);
+            return res.status(500).json(err);
+        }
+
+        return res.status(200).send({ status: true, message: 'File uploaded sucessfully!', result: req.files });
+    })
+
+});
 
 router.post('/add', [commonMiddleware], function (req, res) {
 
     SpaceModel.add_space(req.body, function (err, result) {
         if (err) { return res.status(500).send({ status: false, errors: err }); }
-        return res.send({ status: true, message: 'Space Registered Successfully' });
+        return res.send({ status: true, message: 'Space Registered Successfully', result: { insertId: result.insertId } });
     });
-    // SpaceModel.upload(req.body.image_url, res, function(err) {
-    //     if (err) {
-    //         return res.end("Something went wrong!");
-    //     }
-    //     return res.end("File uploaded sucessfully!.");
-    // });
+
 });
 
 router.get('/all', [commonMiddleware], function (req, res) {
