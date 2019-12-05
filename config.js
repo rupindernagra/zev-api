@@ -5,6 +5,7 @@ module.exports = {
         host: 'localhost',
         user: 'root',
         password: 'root',
-        database: 'zev'
+        database: 'zev',
+        port: 3001
     }
 };
