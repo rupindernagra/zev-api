@@ -1,9 +1,10 @@
 const mysql = require('mysql');
+const config = require('./config');
 const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'root',
-  database: 'zev'
+  host: config.db.host,
+  user: config.db.user,
+  password: config.db.password,
+  database: config.db.database
 });
 connection.connect((err) => {
   if (err) throw err;

@@ -1,4 +1,10 @@
 // config.js
 module.exports = {
-    'secret': 'supersecret'
+    'secret': 'supersecret',
+    db: {
+        host: 'localhost',
+        user: 'root',
+        password: 'root',
+        database: 'zev'
+    }
 };

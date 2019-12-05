@@ -106,4 +106,4 @@ dist
 .tern-port
 
 # Database Credentials
-db.js
+config.js
