@@ -59,7 +59,7 @@ class SpaceModel extends BaseModel {
     }
 
     mySpaces(userId, callback) {
-        var query = `SELECT S.*, (SELECT COUNT(A.space_id) FROM ${this.Applications} A WHERE A.space_id = S.id ) AS applicants FROM ${this._table} S WHERE S.user_id = ${userId}`;
+        var query = `SELECT S.*, (SELECT COUNT(A.space_id) FROM ${this.Applications} A WHERE A.space_id = S.id ) AS applicants FROM ${this._table} S WHERE S.user_id = ${userId} ORDER BY S.id DESC`;
         this.find(query, function(err, result) {
             if((result && result.length === 0) || result === undefined) {
                 callback({ 'message': `Spaces not found` }, false);
