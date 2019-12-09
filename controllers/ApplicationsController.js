@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var commonMiddleware = require('../helpers/commonMiddleware')
 var router = express.Router();
+var SendController = require('./SendController');
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 var ApplicationsModel = require('../models/ApplicationsModel')
