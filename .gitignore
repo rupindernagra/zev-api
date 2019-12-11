@@ -40,10 +40,12 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
-assets/images/avatar/*
-assets/images/space/*
-!assets/images/avatar/
-!assets/images/space/
+assets/*
+assets/*
+!assets/css
+!assets/js
+!assets/images/avatar
+!assets/images/space
 
 # TypeScript v1 declaration files
 typings/
