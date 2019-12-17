@@ -24,6 +24,7 @@
     "nodemailer": "^6.4.1",
     "nodemailer-mailgun-transport": "^1.4.0",
     "nodemailer-smtp-transport": "^2.7.4",
+    "plaid": "^4.3.0",
     "request": "^2.88.0",
     "sendmail": "^1.4.1",
     "socket.io": "^2.2.0"

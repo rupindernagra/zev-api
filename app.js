@@ -30,6 +30,7 @@ var SpaceController = require('./controllers/SpaceController');
 var ApplicationsController = require('./controllers/ApplicationsController');
 var SearchController = require('./controllers/SearchController');
 var SendController = require('./controllers/SendController');
+var PlaidController = require('./controllers/PlaidController');
 
 app.use('/api/auth', AuthController);
 app.use('/api/register', RegisterController);
@@ -38,6 +39,7 @@ app.use('/api/space', SpaceController);
 app.use('/api/application', ApplicationsController);
 app.use('/api/search', SearchController);
 app.use('/api/send', SendController);
+app.use('/api/plaid', PlaidController);
 
 // app.use("/api/Upload", function(req, res) {
     
