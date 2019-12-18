@@ -11,9 +11,11 @@ class ApplicationsModel extends BaseModel {
             email: { 'type': 'email', 'required': true, 'value': '', 'error': 'Email is Required!' },
             phone: { 'type': 'phone', 'required': false, 'value': '' },
             message: { 'type': 'text', 'required': false, 'value': '' },
-            reports: { 'type': 'text', 'required': false, 'value': '' }
+            reports: { 'type': 'text', 'required': false, 'value': '' },
+            plaid_item_id: { 'type': 'text', 'required': true, 'value': '', 'error': 'Item id is required' },
+            plaid_access_token: { 'type': 'text', 'required': true, 'value': '', 'error': 'access token is required' }
         };
-        this._table = "applications";        
+        this._table = "applications";
     }
 
     saveApplication(data, callback) {

@@ -58,15 +58,14 @@ router.post('/get_access_token', function (request, response, next) {
 
 // Retrieve ACH or EFT Auth data for an Item's accounts
 // https://plaid.com/docs/#auth
-router.get('/auth', function (request, response, next) {
+router.get('/auth/:access_token', function (request, response, next) {
+    ACCESS_TOKEN = request.params.access_token;
     client.getAuth(ACCESS_TOKEN, function (error, authResponse) {
         if (error != null) {
-            // prettyPrintResponse(error);
             return response.json({
                 error: error,
             });
         }
-        // prettyPrintResponse(authResponse);
         response.json({ error: null, auth: authResponse });
     });
 });

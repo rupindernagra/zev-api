@@ -19,7 +19,7 @@ class SearchModel extends BaseModel {
     }
 
     searchApplicants(data, callback) {
-        var query = `SELECT A.*, S.* FROM ${this.Applications} A INNER JOIN ${this.Spaces} S ON A.space_id = S.id WHERE S.user_id = ${data.user_id} AND (A.firstname LIKE '%${data.firstname}%' AND A.lastname LIKE '%${data.lastname}%' )`;
+        var query = `SELECT A.*, S.* FROM ${this.Applications} A INNER JOIN ${this.Spaces} S ON A.space_id = S.id WHERE S.user_id = ${data.user_id} AND (A.fullname LIKE '%${data.fullname}%' )`;
         this.find(query, function(err, result) {
             if((result && result.length === 0) || result === undefined) {
                 callback({ 'message': `Search for applicants do not match` }, false);
