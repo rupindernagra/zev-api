@@ -12,12 +12,16 @@ var PLAID_CLIENT_ID = config.plaid.PLAID_CLIENT_ID;
 var PLAID_SECRET = config.plaid.PLAID_SANDBOX_SECRET;
 var PLAID_PUBLIC_KEY = config.plaid.PLAID_PUBLIC_KEY;
 var PLAID_ENV = config.plaid.PLAID_ENV;
+var STRIPE_SCERET_KEY = 'sk_test_O3NnmXwAPLQNoEeys5zgb5wm00Hmlj6c1X';
 
 // We store the access_token in memory
 // In production, store it in a secure persistent data store
 var ACCESS_TOKEN = null;
 var PUBLIC_TOKEN = null;
 var ITEM_ID = null;
+
+// Account Id for bank details
+var ACCOUNT_ID = null;
 
 // Initialize the Plaid client
 var client = new plaid.Client(
@@ -41,6 +45,8 @@ router.get('/', function (request, response, next) {
 
 router.post('/get_access_token', function (request, response, next) {
     PUBLIC_TOKEN = request.body.public_token;
+    ACCOUNT_ID = request.body.account_id;
+
     client.exchangePublicToken(PUBLIC_TOKEN, function (error, tokenResponse) {
         if (error != null) {
             var msg = 'Could not exchange public_token!';
@@ -49,9 +55,15 @@ router.post('/get_access_token', function (request, response, next) {
                 error: msg
             });
         }
-        response.json({
-            tokenResponse: tokenResponse,
-            error: false
+        // Generate a bank account token
+        client.createStripeToken(tokenResponse.access_token, ACCOUNT_ID, function (err, res) {
+            console.log('bank account', res);
+            // var bankAccountToken = res.stripe_bank_account_token;
+            response.json({
+                tokenResponse: tokenResponse,
+                // bankAccountToken,
+                error: false
+            });
         });
     });
 });
