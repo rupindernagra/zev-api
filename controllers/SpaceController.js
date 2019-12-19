@@ -116,4 +116,16 @@ router.put('/update/views/:spaceId', [commonMiddleware], function (req, res) {
     
 });
 
+router.put('/my/update/:spaceId', [commonMiddleware], function (req, res) {
+
+    const { params: { spaceId } } = req;
+    SpaceModel.mySpaceUpdateById({payload: req.body, spaceId: spaceId}, function(err, result) {
+        if (err) {
+            return res.status(500).send({ status: false, errors: err });
+        }
+        return res.send({ status: true, message: 'Space changes are updated', result: result });
+    });
+    
+});
+
 module.exports = router;

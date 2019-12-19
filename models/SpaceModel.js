@@ -91,6 +91,20 @@ class SpaceModel extends BaseModel {
         });
     }
 
+    mySpaceUpdateById(data, callback) {
+        const { space_name, description, city, price, space_status, space_type, no_of_balconies, balconies_space, no_of_bedrooms, no_of_bathrooms, no_of_garages, no_of_parkings, user_id } = data.payload;
+        var query = `UPDATE ${this._table}
+            SET space_name = '${space_name}', description = '${description}', city = '${city}', price = '${price}', space_status = '${space_status}', space_type = '${space_type}', no_of_balconies = ${no_of_balconies}, balconies_space = '${balconies_space}', no_of_bedrooms = ${no_of_bedrooms}, no_of_bathrooms = ${no_of_bathrooms}, no_of_garages = ${no_of_garages}, no_of_parkings = ${no_of_parkings}
+            WHERE id = ${data.spaceId} AND user_id = ${user_id} `;
+        this.find(query, function(err, result) {
+            if(result && result.length == 0) {
+                callback({ message: `Space changes are not updated` }, false);
+            } else {
+                callback(false, result);
+            }
+        });
+    }
+
     get Applications() {
         if(typeof this.applications === 'undefined') {
             this.applications = require('./ApplicationsModel')._table

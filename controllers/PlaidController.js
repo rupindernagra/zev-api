@@ -46,6 +46,34 @@ router.get('/', function (request, response, next) {
 router.post('/get_access_token', function (request, response, next) {
     PUBLIC_TOKEN = request.body.public_token;
     ACCOUNT_ID = request.body.account_id;
+    console.log('tojen', PUBLIC_TOKEN);
+    console.log('act id', ACCOUNT_ID);
+    var INSTITUTION_ID = request.body.institution_id;
+    var INITIAL_PRODUCTS = request.body.initial_products;
+
+    // client.sandboxPublicTokenCreate(
+    //     INSTITUTION_ID, INITIAL_PRODUCTS, function (err, createResponse) {
+    //         // Handle error, if present
+    //         if (err != null) {
+    //             var msg = 'Could not exchange public_token!';
+    //             console.log(msg + '\n' + JSON.stringify(err));
+    //             return response.json({
+    //                 err: msg
+    //             });
+    //         }
+    //         var publicToken = createResponse.public_token;
+    //         // The generated public_token can now be exchanged
+    //         // for an access_token
+    //         client.exchangePublicToken(publicToken, function (err,
+    //             exchangeResponse) {
+    //             // Handle error, if present
+    //             // var accessToken = exchangeResponse.access_token;
+    //             response.json({
+    //                 exchangeResponse: exchangeResponse,
+    //                 error: false
+    //             });
+    //         });
+    //     });
 
     client.exchangePublicToken(PUBLIC_TOKEN, function (error, tokenResponse) {
         if (error != null) {
@@ -55,13 +83,14 @@ router.post('/get_access_token', function (request, response, next) {
                 error: msg
             });
         }
+        
         // Generate a bank account token
         client.createStripeToken(tokenResponse.access_token, ACCOUNT_ID, function (err, res) {
             console.log('bank account', res);
-            // var bankAccountToken = res.stripe_bank_account_token;
+            // var stripeToken = res.stripe_bank_account_token;
             response.json({
                 tokenResponse: tokenResponse,
-                // bankAccountToken,
+                stripeToken: res,
                 error: false
             });
         });
