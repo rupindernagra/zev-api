@@ -28,7 +28,7 @@ var client = new plaid.Client(
     PLAID_CLIENT_ID,
     PLAID_SECRET,
     PLAID_PUBLIC_KEY,
-    plaid.environments[PLAID_ENV],
+    plaid.environments.sandbox,
     { version: '2019-05-29' }
 );
 
@@ -45,35 +45,13 @@ router.get('/', function (request, response, next) {
 
 router.post('/get_access_token', function (request, response, next) {
     PUBLIC_TOKEN = request.body.public_token;
-    ACCOUNT_ID = request.body.account_id;
+    // ACCOUNT_ID = request.body.account_id;
     console.log('tojen', PUBLIC_TOKEN);
-    console.log('act id', ACCOUNT_ID);
-    var INSTITUTION_ID = request.body.institution_id;
-    var INITIAL_PRODUCTS = request.body.initial_products;
+    // console.log('act id', ACCOUNT_ID);
+    // var INSTITUTION_ID = request.body.institution_id;
+    // var INITIAL_PRODUCTS = request.body.initial_products;
 
-    // client.sandboxPublicTokenCreate(
-    //     INSTITUTION_ID, INITIAL_PRODUCTS, function (err, createResponse) {
-    //         // Handle error, if present
-    //         if (err != null) {
-    //             var msg = 'Could not exchange public_token!';
-    //             console.log(msg + '\n' + JSON.stringify(err));
-    //             return response.json({
-    //                 err: msg
-    //             });
-    //         }
-    //         var publicToken = createResponse.public_token;
-    //         // The generated public_token can now be exchanged
-    //         // for an access_token
-    //         client.exchangePublicToken(publicToken, function (err,
-    //             exchangeResponse) {
-    //             // Handle error, if present
-    //             // var accessToken = exchangeResponse.access_token;
-    //             response.json({
-    //                 exchangeResponse: exchangeResponse,
-    //                 error: false
-    //             });
-    //         });
-    //     });
+console.log('plaid.env', plaid.environments);
 
     client.exchangePublicToken(PUBLIC_TOKEN, function (error, tokenResponse) {
         if (error != null) {
@@ -85,15 +63,14 @@ router.post('/get_access_token', function (request, response, next) {
         }
         
         // Generate a bank account token
-        client.createStripeToken(tokenResponse.access_token, ACCOUNT_ID, function (err, res) {
-            console.log('bank account', res);
+        // client.createStripeToken(tokenResponse.access_token, ACCOUNT_ID, function (err, res) {
+            // console.log('bank account', res);
             // var stripeToken = res.stripe_bank_account_token;
             response.json({
                 tokenResponse: tokenResponse,
-                stripeToken: res,
                 error: false
             });
-        });
+        // });
     });
 });
 
@@ -108,6 +85,59 @@ router.get('/auth/:access_token', function (request, response, next) {
             });
         }
         response.json({ error: null, auth: authResponse });
+    });
+});
+
+router.post('/get_stripe_bank_token', function (request, response, next) {
+    // PUBLIC_TOKEN = request.body.public_token;
+    ACCESS_TOKEN = request.body.access_token
+    ACCOUNT_ID = request.body.account_id;
+       
+    // Generate a bank account token
+    client.createStripeToken(ACCESS_TOKEN, ACCOUNT_ID, function (err, res) {
+        if (err != null) {
+            var msg = 'Stripe bank token not found';
+            console.log(msg + '\n' + JSON.stringify(error));
+            return response.json({
+                error: err,
+                message: msg
+            });
+        }
+        
+        console.log('bank account', res);
+        response.json({
+            stripeToken: res,
+            error: false
+        });
+    });
+});
+
+router.post('/get_transactions', function (request, response, next) {
+    // PUBLIC_TOKEN = request.body.public_token;
+    ACCESS_TOKEN = request.body.access_token
+    const START_DATA = request.body.start_date;
+    const END_DATA = request.body.end_date;
+    const OPTIONS = {
+        account_ids: null,
+        count: 100,
+        offset: 0
+    }
+    
+    // Generate a bank account token
+    client.getTransactions(ACCESS_TOKEN, START_DATA, END_DATA, OPTIONS, function (err, res) {
+        if (err != null) {
+            var msg = 'Transactions not found';
+            console.log(msg + '\n' + JSON.stringify(error));
+            return response.json({
+                error: err,
+                message: msg
+            });
+        }
+        console.log('transactions', res);
+        response.json({
+            transactions: res.transactions,
+            error: false
+        });
     });
 });
 
