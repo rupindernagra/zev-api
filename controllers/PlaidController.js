@@ -13,6 +13,7 @@ var PLAID_SECRET = config.plaid.PLAID_SANDBOX_SECRET;
 var PLAID_PUBLIC_KEY = config.plaid.PLAID_PUBLIC_KEY;
 var PLAID_ENV = config.plaid.PLAID_ENV;
 var STRIPE_SCERET_KEY = 'sk_test_O3NnmXwAPLQNoEeys5zgb5wm00Hmlj6c1X';
+const stripe = require('stripe')(STRIPE_SCERET_KEY);
 
 // We store the access_token in memory
 // In production, store it in a secure persistent data store
@@ -51,7 +52,7 @@ router.post('/get_access_token', function (request, response, next) {
     // var INSTITUTION_ID = request.body.institution_id;
     // var INITIAL_PRODUCTS = request.body.initial_products;
 
-console.log('plaid.env', plaid.environments);
+    console.log('plaid.env', plaid.environments);
 
     client.exchangePublicToken(PUBLIC_TOKEN, function (error, tokenResponse) {
         if (error != null) {
@@ -61,15 +62,15 @@ console.log('plaid.env', plaid.environments);
                 error: msg
             });
         }
-        
+
         // Generate a bank account token
         // client.createStripeToken(tokenResponse.access_token, ACCOUNT_ID, function (err, res) {
-            // console.log('bank account', res);
-            // var stripeToken = res.stripe_bank_account_token;
-            response.json({
-                tokenResponse: tokenResponse,
-                error: false
-            });
+        // console.log('bank account', res);
+        // var stripeToken = res.stripe_bank_account_token;
+        response.json({
+            tokenResponse: tokenResponse,
+            error: false
+        });
         // });
     });
 });
@@ -88,27 +89,81 @@ router.get('/auth/:access_token', function (request, response, next) {
     });
 });
 
+// Stripe APIs
 router.post('/get_stripe_bank_token', function (request, response, next) {
     // PUBLIC_TOKEN = request.body.public_token;
     ACCESS_TOKEN = request.body.access_token
     ACCOUNT_ID = request.body.account_id;
-       
+
     // Generate a bank account token
     client.createStripeToken(ACCESS_TOKEN, ACCOUNT_ID, function (err, res) {
         if (err != null) {
             var msg = 'Stripe bank token not found';
-            console.log(msg + '\n' + JSON.stringify(error));
+            console.log(msg + '\n' + JSON.stringify(err));
             return response.json({
                 error: err,
                 message: msg
             });
         }
-        
+
         console.log('bank account', res);
         response.json({
             stripeToken: res,
             error: false
         });
+    });
+});
+
+router.post('/stripe/customer', function (request, response, next) {
+    const STRIPE_BANK_TOKEN = request.body.stripe_bank_token;
+
+    // Create a Customer
+    stripe.customers.create({
+        description: "Example customer",
+        source: STRIPE_BANK_TOKEN,
+    }, function (err, customer) {
+        // called asynchronously
+        if (err != null) {
+            var msg = 'Can\'t fetch customer account';
+            console.log(msg + '\n' + JSON.stringify(err));
+            return response.json({
+                error: err,
+                message: msg
+            });
+        }
+
+        console.log('bank account', customer);
+        // response.json({
+        //     customer: customer,
+        //     error: false
+        // });
+
+        // Verify customer and bank with two small deposits; if using stripe without Plaid
+        // var data = { amounts: [32, 45] }
+        // stripe.customers.verifySource(
+        //     'cus_AFGbOSiITuJVDs',
+        //     'ba_17SHwa2eZvKYlo2CUx7nphbZ',
+        //     {
+        //         amounts: [32, 45],
+        //     },
+        //     function (err, bankAccount) {
+        //         // asynchronously called
+        //     }
+        // );
+
+        // Create a charge on a verified bank account
+        stripe.charges.create({
+            amount: 1500,
+            currency: 'usd',
+            customer: customer.id,
+        }).then(function (charge) {
+            // asynchronously called
+            response.json({
+                charge: charge,
+                error: false
+            });
+        });
+
     });
 });
 
@@ -122,7 +177,7 @@ router.post('/get_transactions', function (request, response, next) {
         count: 100,
         offset: 0
     }
-    
+
     // Generate a bank account token
     client.getTransactions(ACCESS_TOKEN, START_DATA, END_DATA, OPTIONS, function (err, res) {
         if (err != null) {
