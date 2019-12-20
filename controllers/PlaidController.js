@@ -46,13 +46,7 @@ router.get('/', function (request, response, next) {
 
 router.post('/get_access_token', function (request, response, next) {
     PUBLIC_TOKEN = request.body.public_token;
-    // ACCOUNT_ID = request.body.account_id;
     console.log('tojen', PUBLIC_TOKEN);
-    // console.log('act id', ACCOUNT_ID);
-    // var INSTITUTION_ID = request.body.institution_id;
-    // var INITIAL_PRODUCTS = request.body.initial_products;
-
-    console.log('plaid.env', plaid.environments);
 
     client.exchangePublicToken(PUBLIC_TOKEN, function (error, tokenResponse) {
         if (error != null) {
@@ -63,15 +57,10 @@ router.post('/get_access_token', function (request, response, next) {
             });
         }
 
-        // Generate a bank account token
-        // client.createStripeToken(tokenResponse.access_token, ACCOUNT_ID, function (err, res) {
-        // console.log('bank account', res);
-        // var stripeToken = res.stripe_bank_account_token;
         response.json({
             tokenResponse: tokenResponse,
             error: false
         });
-        // });
     });
 });
 
@@ -89,7 +78,9 @@ router.get('/auth/:access_token', function (request, response, next) {
     });
 });
 
-// Stripe APIs
+/**
+ * START - Stripe APIs 
+ */
 router.post('/get_stripe_bank_token', function (request, response, next) {
     // PUBLIC_TOKEN = request.body.public_token;
     ACCESS_TOKEN = request.body.access_token
@@ -114,17 +105,14 @@ router.post('/get_stripe_bank_token', function (request, response, next) {
     });
 });
 
-router.post('/stripe/customer', function (request, response, next) {
-    const STRIPE_BANK_TOKEN = request.body.stripe_bank_token;
+router.post('/stripe/payment', function (request, response, next) {
+    ACCESS_TOKEN = request.body.access_token
+    ACCOUNT_ID = request.body.account_id;
 
-    // Create a Customer
-    stripe.customers.create({
-        description: "Example customer",
-        source: STRIPE_BANK_TOKEN,
-    }, function (err, customer) {
-        // called asynchronously
+    // Generate a bank account token
+    client.createStripeToken(ACCESS_TOKEN, ACCOUNT_ID, function (err, res) {
         if (err != null) {
-            var msg = 'Can\'t fetch customer account';
+            var msg = 'Stripe bank token not found';
             console.log(msg + '\n' + JSON.stringify(err));
             return response.json({
                 error: err,
@@ -132,43 +120,64 @@ router.post('/stripe/customer', function (request, response, next) {
             });
         }
 
-        console.log('bank account', customer);
-        // response.json({
-        //     customer: customer,
-        //     error: false
-        // });
+        // Create a Customer
+        stripe.customers.create({
+            email: "someone@example.com",
+            description: "Example customer",
+            source: res.stripe_bank_account_token,
+        }, function (err, customer) {
+            // called asynchronously
+            if (err != null) {
+                var msg = 'Can\'t fetch customer account';
+                console.log(msg + '\n' + JSON.stringify(err));
+                return response.json({
+                    error: err,
+                    message: msg
+                });
+            }
 
-        // Verify customer and bank with two small deposits; if using stripe without Plaid
-        // var data = { amounts: [32, 45] }
-        // stripe.customers.verifySource(
-        //     'cus_AFGbOSiITuJVDs',
-        //     'ba_17SHwa2eZvKYlo2CUx7nphbZ',
-        //     {
-        //         amounts: [32, 45],
-        //     },
-        //     function (err, bankAccount) {
-        //         // asynchronously called
-        //     }
-        // );
+            // Verify customer and bank with two small deposits; if using stripe without Plaid
+            // var data = { amounts: [32, 45] }
+            // stripe.customers.verifySource(
+            //     'cus_AFGbOSiITuJVDs',
+            //     'ba_17SHwa2eZvKYlo2CUx7nphbZ',
+            //     {
+            //         amounts: [32, 45],
+            //     },
+            //     function (err, bankAccount) {
+            //         // asynchronously called
+            //     }
+            // );
 
-        // Create a charge on a verified bank account
-        stripe.charges.create({
-            amount: 1500,
-            currency: 'usd',
-            customer: customer.id,
-        }).then(function (charge) {
-            // asynchronously called
-            response.json({
-                charge: charge,
-                error: false
+            // Create a charge on a verified bank account
+            stripe.charges.create({
+                amount: 1200,
+                currency: 'usd',
+                customer: customer.id,
+            }).then(charge => {
+                // asynchronously called
+                response.json({
+                    charge: charge,
+                    customer: customer,
+                    error: false
+                });
+            }).catch(err => {
+                var msg = 'Customer id is not match';
+                console.log(msg + '\n' + JSON.stringify(err));
+                return response.json({
+                    error: err,
+                    message: msg
+                });
             });
-        });
 
+        });
     });
+
 });
+/* End - Stripe APIs */
+
 
 router.post('/get_transactions', function (request, response, next) {
-    // PUBLIC_TOKEN = request.body.public_token;
     ACCESS_TOKEN = request.body.access_token
     const START_DATA = request.body.start_date;
     const END_DATA = request.body.end_date;
