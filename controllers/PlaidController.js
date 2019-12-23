@@ -46,7 +46,6 @@ router.get('/', function (request, response, next) {
 
 router.post('/get_access_token', function (request, response, next) {
     PUBLIC_TOKEN = request.body.public_token;
-    console.log('tojen', PUBLIC_TOKEN);
 
     client.exchangePublicToken(PUBLIC_TOKEN, function (error, tokenResponse) {
         if (error != null) {
@@ -68,6 +67,7 @@ router.post('/get_access_token', function (request, response, next) {
 // https://plaid.com/docs/#auth
 router.get('/auth/:access_token', function (request, response, next) {
     ACCESS_TOKEN = request.params.access_token;
+    
     client.getAuth(ACCESS_TOKEN, function (error, authResponse) {
         if (error != null) {
             return response.json({
@@ -82,7 +82,6 @@ router.get('/auth/:access_token', function (request, response, next) {
  * START - Stripe APIs 
  */
 router.post('/get_stripe_bank_token', function (request, response, next) {
-    // PUBLIC_TOKEN = request.body.public_token;
     ACCESS_TOKEN = request.body.access_token
     ACCOUNT_ID = request.body.account_id;
 
@@ -97,7 +96,6 @@ router.post('/get_stripe_bank_token', function (request, response, next) {
             });
         }
 
-        console.log('bank account', res);
         response.json({
             stripeToken: res,
             error: false
@@ -106,8 +104,9 @@ router.post('/get_stripe_bank_token', function (request, response, next) {
 });
 
 router.post('/stripe/payment', function (request, response, next) {
-    ACCESS_TOKEN = request.body.access_token
-    ACCOUNT_ID = request.body.account_id;
+    const { access_token, account_id, meta } = request.body;
+    ACCESS_TOKEN = access_token;
+    ACCOUNT_ID = account_id;
 
     // Generate a bank account token
     client.createStripeToken(ACCESS_TOKEN, ACCOUNT_ID, function (err, res) {
@@ -122,8 +121,8 @@ router.post('/stripe/payment', function (request, response, next) {
 
         // Create a Customer
         stripe.customers.create({
-            email: "someone@example.com",
-            description: "Example customer",
+            email: meta.email,
+            description: `Charge for space - Item id: ${meta.plaid_item_id}`,
             source: res.stripe_bank_account_token,
         }, function (err, customer) {
             // called asynchronously
@@ -154,6 +153,8 @@ router.post('/stripe/payment', function (request, response, next) {
                 amount: 1200,
                 currency: 'usd',
                 customer: customer.id,
+                receipt_email: meta.email,
+                metadata: meta
             }).then(charge => {
                 // asynchronously called
                 response.json({
@@ -172,12 +173,32 @@ router.post('/stripe/payment', function (request, response, next) {
 
         });
     });
+});
 
+router.get('/stripe/transaction/:pay_id', function (request, response, next) {
+    const {pay_id} = request.params;
+
+    stripe.charges.retrieve(pay_id, function (err, charge) {
+        // asynchronously called
+        if (err != null) {
+            var msg = 'Payment/Charge id is incorrect';
+            console.log(msg + '\n' + JSON.stringify(err));
+            return response.json({
+                error: err,
+                message: msg
+            });
+        }
+
+        response.json({
+            charge: charge,
+            error: false
+        });
+    });
 });
 /* End - Stripe APIs */
 
 
-router.post('/get_transactions', function (request, response, next) {
+router.post('/transactions', function (request, response, next) {
     ACCESS_TOKEN = request.body.access_token
     const START_DATA = request.body.start_date;
     const END_DATA = request.body.end_date;
@@ -197,7 +218,7 @@ router.post('/get_transactions', function (request, response, next) {
                 message: msg
             });
         }
-        console.log('transactions', res);
+
         response.json({
             transactions: res.transactions,
             error: false

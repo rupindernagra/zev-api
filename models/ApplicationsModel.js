@@ -13,7 +13,12 @@ class ApplicationsModel extends BaseModel {
             message: { 'type': 'text', 'required': false, 'value': '' },
             reports: { 'type': 'text', 'required': false, 'value': '' },
             plaid_item_id: { 'type': 'text', 'required': true, 'value': '', 'error': 'Item id is required' },
-            plaid_access_token: { 'type': 'text', 'required': true, 'value': '', 'error': 'access token is required' }
+            plaid_access_token: { 'type': 'text', 'required': true, 'value': '', 'error': 'Access token is required' },
+            stripe_payment_id: { 'type': 'text', 'required': true, 'value': '', 'error': 'Stripe payment id is required' },
+            amount: { 'type': 'text', 'required': true, 'value': '', 'error': 'Amount is requires' },
+            customer_id: { 'type': 'text', 'required': true, 'value': '', 'error': 'Austomer id is required' },
+            receipt_url: { 'type': 'text', 'required': true, 'value': '', 'error': 'Receipt url is required' },
+            routing_number: { 'type': 'number', 'required': true, 'value': '', 'error': 'Routing number is required' }
         };
         this._table = "applications";
     }
