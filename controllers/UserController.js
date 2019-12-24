@@ -22,11 +22,21 @@ router.get('/all', [commonMiddleware], function (req, res) {
 router.get('/id/:userId', [commonMiddleware], function (req, res) {
 
     const { params: { userId } } = req;
-    UserModel.getUserData(userId, function (err, result) {
+    UserModel.getUserInfo(userId, function (err, result) {
         if (err) { return res.status(500).send({ status: false, errors: err }); }
-        return res.send({ status: true, message: 'User exists', result: result });
+        return res.send({ status: true, message: 'User information', result: result });
     });
-  
+
+});
+
+router.post('/profile', [commonMiddleware], function (req, res) {
+
+    const { body: { userId } } = req;
+    UserModel.getUserProfile(userId, function (err, result) {
+        if (err) { return res.status(500).send({ status: false, errors: err }); }
+        return res.send({ status: true, message: 'User profile information', result: result });
+    });
+
 });
 
 // Upload avatar of user
@@ -66,5 +76,24 @@ router.post('/upload/:userId/avatar/', function(req, res) {
 
 });
 
+router.put('/update/info/:userId', function(req, res) {
+
+    const { params: { userId } } = req;
+    UserModel.updateUserProfile({payload: req.body, userId}, function(err, result) {
+        if (err) { return res.status(500).send({ status: false, errors: err }); }
+        return res.send({ status: true, message: 'User information has been updated', result: result });
+    });
+    
+});
+
+router.put('/update/password/:userId', function(req, res) {
+
+    const { params: { userId } } = req;
+    UserModel.updatePassword({payload: req.body, userId}, function(err, result) {
+        if (err) { return res.status(500).send({ status: false, errors: err }); }
+        return res.send({ status: true, message: 'Password has been updated', result: result });
+    });
+    
+});
 
 module.exports = router;
