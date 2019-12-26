@@ -67,10 +67,7 @@ class UserModel extends BaseModel {
     updatePassword(data, callback) {
         const { oldPassword, newPassword } = data.payload;
         var query = `UPDATE ${this._table} SET password = '${newPassword}' WHERE id = ${data.userId} AND password = '${oldPassword}'`;
-        console.log(query);
         this.find(query, function (err, result) {
-            console.log('err', err);
-            console.log('res', result);
             if (typeof result === 'undefined') {
                 callback({ message: `Sorry! error in API` }, false);
             } else {
