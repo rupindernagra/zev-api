@@ -26,6 +26,19 @@ router.post('/my/all', [commonMiddleware], function (req, res) {
 
 });
 
+router.post('/my/:applId', [commonMiddleware], function (req, res) {
+
+    const { body: { user_id } } = req;
+    const { params: { applId } } = req;
+    ApplicationsModel.getApplicantById({userId: user_id, applId: applId}, function(err, result) {
+        if (err) {
+            return res.status(500).send({ status: false, errors: err });
+        }
+        return res.send({ status: true, message: 'Current applicant data', result: result });
+    });
+    
+});
+
 router.post('/my/space/:spaceId', [commonMiddleware], function (req, res) {
 
     const { body: { user_id } } = req;

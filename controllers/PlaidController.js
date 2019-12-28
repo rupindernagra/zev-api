@@ -67,7 +67,7 @@ router.post('/get_access_token', function (request, response, next) {
 // https://plaid.com/docs/#auth
 router.get('/auth/:access_token', function (request, response, next) {
     ACCESS_TOKEN = request.params.access_token;
-    
+
     client.getAuth(ACCESS_TOKEN, function (error, authResponse) {
         if (error != null) {
             return response.json({
@@ -176,7 +176,7 @@ router.post('/stripe/payment', function (request, response, next) {
 });
 
 router.get('/stripe/transaction/:pay_id', function (request, response, next) {
-    const {pay_id} = request.params;
+    const { pay_id } = request.params;
 
     stripe.charges.retrieve(pay_id, function (err, charge) {
         // asynchronously called
@@ -221,6 +221,88 @@ router.post('/transactions', function (request, response, next) {
 
         response.json({
             transactions: res.transactions,
+            error: false
+        });
+    });
+});
+
+/**
+ * Asset Report API - Plaid
+ */
+router.get('/asset_report/create', function (request, response, next) {
+    ACCESS_TOKENS = ['access-sandbox-a05c7b86-edf1-440d-8ffe-f73c8e082efc'];
+    // ACCESS_TOKEN = request.body.access_token
+    const daysRequested = 60;
+    const options = {
+        client_report_id: '123',    // space id
+        webhook: 'http://localhost:3000',
+        user: {
+            client_user_id: '789',
+            first_name: 'Jane',
+            middle_name: 'Leah',
+            last_name: 'Doe',
+            ssn: '123-45-6789',
+            phone_number: '(555) 123-4567',
+            email: 'jane.doe@example.com',
+        },
+    };
+
+    // ACCESS_TOKENS is an array of Item access tokens.
+    // Note that the assets product must be enabled for all Items.
+    // All fields on the options object are optional.
+    client.createAssetReport(ACCESS_TOKENS, daysRequested, options, (error, createResponse) => {
+        if (error != null) {
+            // Handle error.
+            var msg = 'Error in Asset Report';
+            console.log(msg + '\n' + JSON.stringify(error));
+            return response.json({
+                error: error,
+                message: msg
+            });
+        }
+
+        const assetReportId = createResponse.asset_report_id;
+        const assetReportToken = createResponse.asset_report_token;
+        response.json({
+            result: createResponse,
+            error: false
+        });
+    });
+
+});
+
+
+// ASSET_REPORT_TOKEN is the token from the createAssetReport response.
+router.get('/asset_report/get', function (request, response, next) {
+    const ASSET_REPORT_TOKEN = 'assets-sandbox-34e35ef5-48f6-4692-b65f-b3baf368aeed';
+    // client.getAssetReport(ASSET_REPORT_TOKEN, false, (error, getResponse) => {
+    //     if (error != null) {
+    //         if (error.status_code === 400 &&
+    //             error.error_code === 'PRODUCT_NOT_READY') {
+    //             // Asset report is not ready yet. Try again later.
+    //         } else {
+    //             // Handle error.
+    //         }
+    //     }
+
+    //     const report = getResponse.report;
+    //     console.log('report:', getResponse);
+    //     response.json({
+    //         result: getResponse.report,
+    //         error: false
+    //     });
+    // });
+
+    client.getAssetReportPdf(ASSET_REPORT_TOKEN, (error, pdfResponse) => {
+        if (error != null) {
+            // Handle error.
+        }
+
+        // The PDF is binary data.
+        const pdf = pdfResponse;
+        console.log('pdf', pdfResponse);
+        response.json({
+            result: pdfResponse,
             error: false
         });
     });

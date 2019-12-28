@@ -29,7 +29,7 @@ class ApplicationsModel extends BaseModel {
     }
 
     getApplicants(userId, callback) {
-        var query = `SELECT A.*, S.* FROM ${this._table} A INNER JOIN ${this.Spaces} S ON A.space_id = S.id WHERE S.user_id = ${userId} ORDER BY A.id DESC`;
+        var query = `SELECT A.*, S.space_name, S.description, S.city, S.lat_long, S.user_id, S.space_status, S.space_type FROM ${this._table} A INNER JOIN ${this.Spaces} S ON A.space_id = S.id WHERE S.user_id = ${userId} ORDER BY A.id DESC`;
         this.find(query, function(err, result) {
             if((result && result.length === 0) || result === undefined) {
                 callback({ message: `No Applicants found` }, false);
@@ -39,8 +39,19 @@ class ApplicationsModel extends BaseModel {
         });
     }
 
+    getApplicantById(data, callback) {
+        var query = `SELECT A.*, S.space_name, S.description, S.city, S.lat_long, S.user_id, S.space_status, S.space_type FROM ${this._table} A INNER JOIN ${this.Spaces} S ON A.space_id = S.id WHERE S.user_id = ${data.userId} AND A.id = ${data.applId}`;
+        this.find(query, function(err, result) {
+            if((result && result.length === 0) || result === undefined) {
+                callback({ 'message': `Applicant doesn't exist` }, false);
+            } else {
+                callback(false, result[0]);
+            }
+        });
+    }
+
     getApplicantBySpaceId(data, callback) {
-        var query = `SELECT A.*, S.* FROM ${this._table} A INNER JOIN ${this.Spaces} S ON A.space_id = S.id WHERE S.user_id = ${data.userId} AND S.id = ${data.spaceId} ORDER BY A.id DESC`;
+        var query = `SELECT A.*, S.space_name, S.description, S.city, S.lat_long, S.user_id, S.space_status, S.space_type FROM ${this._table} A INNER JOIN ${this.Spaces} S ON A.space_id = S.id WHERE S.user_id = ${data.userId} AND S.id = ${data.spaceId} ORDER BY A.id DESC`;
         this.find(query, function(err, result) {
             if((result && result.length === 0) || result === undefined) {
                 callback({ message: `Application not found with space id: ${data.spaceId}` }, false);
